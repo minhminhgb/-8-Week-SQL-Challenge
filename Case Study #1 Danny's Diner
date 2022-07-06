@@ -139,3 +139,36 @@ inner join menu m on s.product_id = m.product_id
 where s.order_date <= '2021-01-31'
 group by s.customer_id
 order by s.customer_id
+
+**Bonus 1: 
+
+select s.customer_id, s.order_date, m.product_name, m.price,
+case 
+	when t.join_date > s.order_date then 'N'
+	when t.join_date >= s.order_date then 'Y'
+	else 'N'
+end as member
+from sales as s left join menu m on s.product_id = m.product_id
+left join members t on t.customer_id = s.customer_id
+order by s.customer_id, s.order_date
+
+**Bonus 2:
+
+with summary as 
+(
+select s.customer_id, s.order_date, m.product_name, m.price,
+case 
+	when t.join_date > s.order_date then 'N'
+	when t.join_date <= s.order_date then 'Y'
+	else 'N'
+end as member
+from sales as s left join menu m on s.product_id = m.product_id
+left join members t on t.customer_id = s.customer_id
+order by s.customer_id, s.order_date
+)
+select *,
+case
+	when member = 'N' then NULL
+	else rank() over (partition by customer_id, member order by order_date)
+end as ranking
+from summary
