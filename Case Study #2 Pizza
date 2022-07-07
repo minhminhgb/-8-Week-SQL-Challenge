@@ -3,7 +3,7 @@
 
 
 **Q1: How many pizzas were ordered?**
-```sql
+```
 select count(order_id) from customer_orders
 ```
 
